@@ -5,6 +5,7 @@ import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { NextUIProvider } from '@nextui-org/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
@@ -28,7 +29,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 {pathName !== '/login' && <div className=''>
                     <Footer />
                 </div>}
-
+                <ReactQueryDevtools initialIsOpen={false} />
             </NextUIProvider>
         </QueryClientProvider>
     )

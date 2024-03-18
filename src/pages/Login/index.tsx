@@ -21,19 +21,24 @@ const LoginPage = () => {
     const router = useRouter()
 
 
-    const mutation: any = useMutation<any>({
-        mutationFn: (data) => {
-            return http.post('api/').then(res => res.data)
-        },
-        onSuccess() {
-            reset()
-            router.push('/')
-            toast.success("Muvaffaqqiyatli o'tdingiz!")
-        },
-        onError(error) {
-            toast.error(error.message)
-        }
-    })
+    // const mutation: any = useMutation<any>({
+    //     mutationFn: (data) => {
+    //         return http.post('api/').then(res => res.data)
+    //     },
+    //     onSuccess() {
+    //         reset()
+    //         router.push('/')
+    //         toast.success("Muvaffaqqiyatli o'tdingiz!")
+    //     },
+    //     onError(error) {
+    //         toast.error(error.message)
+    //     }
+    // })
+
+    const onSubmit = async () => {
+        router.push('/')
+        toast.success("Muvaffaqqiyatli o'tdingiz")
+    }
 
     return (
         <div className='flex justify-center xl:gap-[130px] gap-[60px] px-4'>
@@ -44,7 +49,7 @@ const LoginPage = () => {
                         <h2 className='pb-2 sm:pb-3 text-2xl text-center sm:text-3xl lg:text-4xl font-semibold text-text1'>Kirish</h2>
                         <p className='sm:text-base text-center text-text2'>Xush kelibsiz. Iltimos o’z parol va log in kiriting</p>
                     </div>
-                    <form onSubmit={handleSubmit(mutation.mutate)} className='flex flex-col gap-[24px]'>
+                    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-[24px]'>
                         <Input
                             placeholder='Telefon raqam kiriting'
                             variant='bordered'
@@ -67,7 +72,7 @@ const LoginPage = () => {
                             })}
                             isInvalid={!!errors.phone}
                             errorMessage={errors.phone && errors.phone?.message}
-                            isDisabled={mutation.isPending}
+                        // isDisabled={mutation.isPending}
                         />
                         <Input
                             placeholder='Parolingizni kiriting'
@@ -90,7 +95,7 @@ const LoginPage = () => {
                             })}
                             isInvalid={!!errors.password}
                             errorMessage={errors.password && errors.password?.message}
-                            isDisabled={mutation.isPending}
+                        // isDisabled={mutation.isPending}
                         />
                         <Button
                             color='primary'
@@ -98,7 +103,7 @@ const LoginPage = () => {
                             fullWidth
                             radius='sm'
                             className='font-semibold'
-                            isLoading={mutation.isPending}
+                        // isLoading={mutation.isPending}
                         >
                             Kirish
                         </Button>

@@ -9,18 +9,21 @@ import { useQuery } from "@tanstack/react-query";
 import { http } from "@/utils/http";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 function Slider() {
     const sliderRef: any = useRef()
-    const { data, isSuccess } = useQuery({
-        queryKey: ['partners'],
-        queryFn: async () => await http.get("home/partner").then(res => res.data),
-    });
+    const [data, setData] = useState([])
+    // const { data, isSuccess } = useQuery({
+    //     queryKey: ['partners'],
+    //     queryFn: async () => await http.get("home/partner").then(res => res.data),
+    // });
 
     useEffect(() => {
-        sliderRef.current.click()
-    }, [data, isSuccess])
+        http.get('home/partner').then(res => { setData(res.data), sliderRef.current.click() })
+        // sliderRef.current.click()
+    }, [])
 
 
     return (

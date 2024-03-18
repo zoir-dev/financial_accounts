@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "../styles/globals.css";
 import { Providers } from "./providers";
 
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Moliyaviy tahlil",
@@ -17,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`bg-[#F0F0F0] min-h-screen ${inter.className}`}>
+      <body className={`bg-[#F0F0F0] min-h-screen`}>
         <Providers>
           {children}
         </Providers>
