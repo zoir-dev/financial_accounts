@@ -10,7 +10,6 @@ import { http } from "@/utils/http";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
 
 function Slider() {
     const sliderRef: any = useRef()
@@ -21,9 +20,13 @@ function Slider() {
     // });
 
     useEffect(() => {
-        http.get('home/partner').then(res => { setData(res.data), sliderRef.current.click() })
-        // sliderRef.current.click()
+        http.get('home/partner').then(res => setData(res.data))
     }, [])
+    useEffect(() => {
+        if (data.length) {
+            sliderRef.current.click()
+        }
+    }, [data.length])
 
 
     return (

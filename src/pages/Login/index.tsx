@@ -36,7 +36,8 @@ const LoginPage = () => {
     // })
 
     const onSubmit = async () => {
-        router.push('/')
+        router.push('/main')
+        localStorage.setItem('token', 'asd')
         toast.success("Muvaffaqqiyatli o'tdingiz")
     }
 
