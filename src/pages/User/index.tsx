@@ -69,7 +69,7 @@ const UserPage = () => {
                     </div>
                     <div>
                         {data.sort((a: any, b: any) => sortUp ? a.ball - b.ball : b.ball - a.ball).map((d) => (
-                            <Row d={d} key={d.id} index={data.findIndex(a => a.id === d.id)} />
+                            <Row d={d} key={d.id} />
                         ))}
                     </div>
                     <div className='flex items-center justify-between pt-3 px-4 sm:px-6'>
