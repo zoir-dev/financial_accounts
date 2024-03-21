@@ -9,7 +9,7 @@ import Contact from './Contact'
 
 const HomePage = () => {
     return (
-        <div className='flex flex-col gap-[90px] w-full  pb-[90px]'>
+        <div className='flex flex-col gap-[90px] w-full pb-[90px]'>
             <div className='myContainer flex flex-col gap-[90px]'>
                 <Demo />
                 <Results />

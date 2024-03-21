@@ -28,8 +28,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
             {pathName !== '/login' && <div className='pb-[76px]'>
                 <Header />
             </div>}
-            <div className={`${pathName !== '/' && 'myContainer !bg-white'} ${pathName !== '/login' && 'pt-9 sm:pt-12 !bg-white'} min-h-full bg-[#F0F0F0]`}>
-                {children}
+            <div className='w-full overflow-hidden'>
+                <div className={`${pathName !== '/' && ' myContainer !bg-white'} ${pathName !== '/login' && 'pt-9 sm:pt-12 !bg-white'} min-h-full bg-[#F0F0F0]`}>
+                    {children}
+                </div>
             </div>
             {pathName === '/' && <Footer />}
         </NextUIProvider>

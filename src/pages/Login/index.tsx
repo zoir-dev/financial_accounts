@@ -29,7 +29,7 @@ const LoginPage = () => {
             await http.post('auth/signin', form).then(res => {
                 localStorage.setItem('token', res.data.tokens.access_token)
             })
-            router.push('/')
+            router.push('/main')
             toast.success("Muvaffaqqiyatli o'tdingiz!")
             reset()
         } catch (error: any) {
