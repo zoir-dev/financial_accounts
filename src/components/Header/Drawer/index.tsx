@@ -44,7 +44,7 @@ const Drawer = ({ open, setOpen, classNames, links }: thisProps) => {
              ${open ? 'backdrop-blur-md !z-[1000]' : 'opacity-0'}`}
             />
             <div className={`fixed shadow-card w-[300px] p-[16px] max-w-full !z-[1000] !duration-500 ml-[-20px] h-[100vh] top-0 right-0 flex  shadow-lg flex-col gap-[16px] items-center ${open ? 'translate-x-[1px] duration-400' : 'translate-x-[300px]'} bg-primary border-1 border-white rounded-l-lg py-6`}>
-                <div className={open ? 'w-full !z-[1000] flex flex-col justify-between h-full pb-6 pl-12' : 'hidden'}>
+                <div className={open ? 'w-full !z-[1000] flex flex-col justify-between h-full pb-10 pl-12' : 'hidden'}>
                     <div>
                         <div className='flex justify-end'>
                             <X className='text-white cursor-pointer' onClick={() => setOpen(false)} />
