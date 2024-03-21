@@ -24,7 +24,8 @@
     "react-hot-toast": "^2.4.1",
     "react-player": "^2.15.1",
     "sharp": "^0.33.2",
-    "swiper": "^11.0.7"
+    "swiper": "^11.0.7",
+    "use-dehydrated-state": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",

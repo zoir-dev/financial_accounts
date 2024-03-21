@@ -1,8 +1,8 @@
-import React from 'react'
+import UserPage from '@/pages/User'
 
 const User = () => {
     return (
-        <div className='h-96'>User</div>
+        <UserPage />
     )
 }
 

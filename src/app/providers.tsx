@@ -4,7 +4,6 @@ import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { NextUIProvider } from '@nextui-org/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -34,13 +33,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     {pathName !== '/login' && <div className='pb-[76px]'>
                         <Header />
                     </div>}
-                    <div className={`${pathName !== '/' && 'myContainer'} ${pathName !== '/login' && 'pt-[60px]'} overflow-x-hidden`}>
+                    <div className={`${pathName !== '/' && 'myContainer !bg-white'} ${pathName !== '/login' && 'pt-9 sm:pt-12 !bg-white'} min-h-full bg-[#F0F0F0]`}>
                         {children}
                     </div>
                     {pathName === '/' && <Footer />}
                 </NextUIProvider>
             </ReactQueryStreamedHydration>
-            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
     )
 }

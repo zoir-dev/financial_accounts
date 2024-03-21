@@ -1,7 +1,8 @@
+import MainPage from "@/pages/Main"
 
 const Main = () => {
     return (
-        <div className='h-screen'>Main_home</div>
+        <MainPage />
     )
 }
 

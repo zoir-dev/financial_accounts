@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "api.moliyaviytahlil.uz",
       },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
     ],
   },
 };

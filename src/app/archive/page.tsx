@@ -1,8 +1,9 @@
+import ArchivePage from '@/pages/Archive'
 import React from 'react'
 
 const Archive = () => {
     return (
-        <div>Archive</div>
+        <ArchivePage />
     )
 }
 

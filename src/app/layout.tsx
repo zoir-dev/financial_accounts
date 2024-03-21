@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`bg-[#F0F0F0] min-h-screen`}>
+      <body className={`min-h-screen overflow-x-hidden`}>
         <Providers>
           {children}
         </Providers>

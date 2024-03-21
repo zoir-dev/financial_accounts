@@ -96,7 +96,9 @@ const Header = () => {
                 </div> :
                     <Dropdown className={`bg-primary text-white relative border-1 border-primary text-center ${scrolled && 'border-white'}`}>
                         <DropdownTrigger>
-                            <User className={`text-primary ${scrolled && 'text-white'} cursor-pointer hidden lg:flex`} />
+                            <Button isIconOnly variant='light' className='hidden lg:flex'>
+                                <User className={`text-primary ${scrolled && 'text-white'} cursor-pointer `} />
+                            </Button>
                         </DropdownTrigger>
                         <DropdownMenu variant='light' aria-label='actions'>
                             <DropdownItem className='border-b border-white rounded-none pb-3'>
