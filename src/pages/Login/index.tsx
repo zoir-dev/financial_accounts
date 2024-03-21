@@ -5,10 +5,10 @@ import section_img from '@/assets/auth_section.png'
 import logo from '@/assets/logo.png'
 import { Button, Input } from '@nextui-org/react'
 import { useForm } from 'react-hook-form'
-import { useMutation } from '@tanstack/react-query'
 import { http } from '@/utils/http'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 const LoginPage = () => {
 
     const {
@@ -20,21 +20,24 @@ const LoginPage = () => {
 
     const router = useRouter()
 
+    const [loading, setLoading] = useState(false)
 
-    const mutation: any = useMutation<any>({
-        mutationFn: (data) => {
-            return http.post('auth/signin', data).then(res => res.data)
-        },
-        onSuccess() {
-            reset()
+
+    const onSubmit = async (form: any) => {
+        try {
+            setLoading(true)
+            await http.post('auth/signin', form).then(res => {
+                localStorage.setItem('token', res.data.tokens.access_token)
+            })
             router.push('/')
-            localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJveWJla2JlcmRpZXY3MTVAZ21haWwuY29tIiwiaXNfYWN0aXZlIjpmYWxzZSwiaWF0IjoxNzEwOTMyMjU4LCJleHAiOjE3MTExMDUwNTh9.2BexmACZT8oPOplF17IvPd7HDD8rg8TpOX_nD03qPj0')
             toast.success("Muvaffaqqiyatli o'tdingiz!")
-        },
-        onError(error: any) {
+            reset()
+        } catch (error: any) {
             toast.error(error.response?.data?.message || error.message)
+        } finally {
+            setLoading(false)
         }
-    })
+    }
 
     return (
         <div className='flex justify-center xl:gap-[130px] gap-[60px] px-4'>
@@ -45,7 +48,7 @@ const LoginPage = () => {
                         <h2 className='pb-2 sm:pb-3 text-2xl text-center sm:text-3xl lg:text-4xl font-semibold text-text1'>Kirish</h2>
                         <p className='sm:text-base text-center text-text2'>Xush kelibsiz. Iltimos o’z parol va log in kiriting</p>
                     </div>
-                    <form onSubmit={handleSubmit(mutation.mutate)} className='flex flex-col gap-[24px]'>
+                    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-[24px]'>
                         <Input
                             placeholder='Telefon raqam kiriting'
                             variant='bordered'
@@ -68,7 +71,7 @@ const LoginPage = () => {
                             })}
                             isInvalid={!!errors.phone}
                             errorMessage={errors.phone && errors.phone?.message}
-                        // isDisabled={isLoading}
+                            isDisabled={loading}
                         />
                         <Input
                             placeholder='Parolingizni kiriting'
@@ -92,7 +95,7 @@ const LoginPage = () => {
                             })}
                             isInvalid={!!errors.password}
                             errorMessage={errors.password && errors.password?.message}
-                        // isDisabled={isLoading}
+                            isDisabled={loading}
                         />
                         <Button
                             color='primary'
@@ -100,7 +103,7 @@ const LoginPage = () => {
                             fullWidth
                             radius='sm'
                             className='font-semibold'
-                        // isLoading={isLoading}
+                            isLoading={loading}
                         >
                             Kirish
                         </Button>

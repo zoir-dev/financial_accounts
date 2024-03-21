@@ -2,17 +2,17 @@ import { Button } from '@nextui-org/react'
 import { Edit2, Trash2 } from 'lucide-react'
 import React from 'react'
 
-const Row = ({ d, index }: { d: any, index: number }) => {
+const Row = ({ d }: { d: any }) => {
     return (
-        <div key={d.id} className='flex items-center justify-between gap-2 px-4 sm:px-6 py-4 border-b-2 border-default-200'>
+        <div className='flex items-center justify-between gap-2 px-4 sm:px-6 py-4 border-b-2 border-default-200'>
             <div className="flex items-center w-1/2 sm:w-full">
-                <p className="text-sm">{d.name}</p>
+                <p className="text-sm">{d?.name}</p>
             </div>
             <div className="text-center w-full flex items-center">
-                <p>{d.ball}</p>
+                <p>{d?.ball}</p>
                 <div className="w-full flex items-center gap-2">
                     <p className='w-full'></p>
-                    {getRating(d.id)}
+                    {getRating(d?.id)}
                     <div className='flex items-center justify-end w-full'>
                         <Button isIconOnly variant='light'>
                             <Trash2 className='text-primary w-5' />

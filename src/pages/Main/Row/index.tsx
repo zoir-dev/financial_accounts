@@ -11,10 +11,10 @@ const Row = ({ d }: { d: any }) => {
     return (
         <div className='py-6 sm:py-9 px-4 sm:px-6 flex items-center gap-4 border-b-2 border-default-200'>
             <div className='flex items-center gap-4 w-full'>
-                <Image src={d.img} alt='logo' className='rounded-full hidden sm:flex' width={40} height={40} />
+                <Image src={d?.img} alt='logo' className='rounded-full hidden sm:flex' width={40} height={40} />
                 <div className='flex flex-col gap-4 w-full'>
-                    <h4 className='text-sm font-semibold' onClick={() => setShow(!show)}>{d.title}</h4>
-                    <p className={`text-sm sm:text-base text-gray-500 ${show ? 'flex' : 'hidden'} sm:!flex`}>{d.des}</p>
+                    <h4 className='text-sm font-semibold' onClick={() => setShow(!show)}>{d?.title}</h4>
+                    <p className={`text-sm sm:text-base text-gray-500 ${show ? 'flex' : 'hidden'} sm:!flex`}>{d?.des}</p>
                 </div>
             </div>
             <div className='flex gap-1'>
