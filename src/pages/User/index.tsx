@@ -1,15 +1,53 @@
 'use client'
 import { ArrowUp, Plus, Search } from 'lucide-react'
-import { Button, Input, Select, SelectItem, useDisclosure } from '@nextui-org/react'
-import { useState } from 'react'
+import { Button, Input, Select, SelectItem, Spinner, useDisclosure } from '@nextui-org/react'
+import { useEffect, useState } from 'react'
 import Row from './Row'
 import AddModal from './AddModal'
+import { http } from '@/utils/http'
+import Pagination from '@/ui/Pagination'
 
 const UserPage = () => {
     const [page, setPage] = useState(1)
     const [sortUp, setSortUp] = useState(false)
+    const [index, setIndex] = useState(-1)
+    const [search, setSearch] = useState({ region: -1, stir: '', name: '' })
+    const [regions, setRegions] = useState<{ id: number, name: string, organizations: any[] }[]>([])
+    const [data, setData] = useState<any[]>([])
+    const [loading, setLoading] = useState(false)
 
     const { isOpen, onClose, onOpen } = useDisclosure()
+
+    const fetchData = async () => {
+        try {
+            setLoading(true)
+            await http.get('organization').then(res => setData(res.data))
+            await http.get('region').then(res => setRegions(res.data))
+        } catch (error) {
+
+        } finally {
+            setLoading(false)
+        }
+    }
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+    const filteredData = () => {
+        return data.filter(item => {
+            if (search.region !== -1 && item?.region?.id !== search.region) {
+                return false;
+            }
+            if (search.stir && !item?.stir?.toString().includes(search.stir)) {
+                return false;
+            }
+            if (search.name && !item?.name?.toLowerCase().includes(search.name.toLowerCase())) {
+                return false;
+            }
+            return true;
+        });
+    };
+
     return (
         <div className='flex flex-col gap-8'>
             <div className='flex gap-4 lg:items-center justify-between flex-col lg:flex-row'>
@@ -17,16 +55,22 @@ const UserPage = () => {
                     Tashkilot
                 </h2>
                 <div className='flex items-start sm:items-center flex-col-reverse sm:flex-row gap-6 sm:gap-4'>
-                    <Select variant='bordered' color='primary' className='w-[180px] hidden md:flex' placeholder='Viloyat' radius='sm' classNames={{ value: 'text-base' }} startContent={<Search className='text-gray-500 w-5' />}>
-                        <SelectItem key='1' value='1'>
-                            1
-                        </SelectItem>
-                        <SelectItem key='2' value='2'>
-                            2
-                        </SelectItem>
-                        <SelectItem key='3' value='3'>
-                            3
-                        </SelectItem>
+                    <Select
+                        variant='bordered'
+                        color='primary'
+                        className='w-[180px] hidden md:flex'
+                        placeholder='Viloyat' radius='sm'
+                        classNames={{ value: 'text-base' }}
+                        aria-label='region select'
+                        startContent={<Search className='text-gray-500 w-5' />}
+                        onSelectionChange={(e: any) => setSearch({ ...search, region: +e.currentKey || -1 })}
+                    >
+                        {regions.map(r => (
+                            <SelectItem key={r.id} value={r.id}>
+                                {r.name}
+                            </SelectItem>
+                        ))}
+
                     </Select>
                     <Input
                         variant='bordered' color='primary' radius='sm' placeholder='STIR'
@@ -35,6 +79,7 @@ const UserPage = () => {
                         }}
                         startContent={<Search className='text-gray-500 w-5' />}
                         className='w-full sm:w-[180px] hidden md:flex'
+                        onChange={(e) => setSearch({ ...search, stir: e.target.value })}
                     />
                     <Input
                         variant='bordered' color='primary' radius='sm' placeholder='Nomi'
@@ -43,6 +88,7 @@ const UserPage = () => {
                         }}
                         startContent={<Search className='text-gray-500 w-5' />}
                         className='w-full sm:w-[180px]'
+                        onChange={(e) => setSearch({ ...search, name: e.target.value })}
                     />
                     <Button color='primary' radius='sm' startContent={<Plus />} onClick={onOpen}>
                         Tashkilot q&apos;shish
@@ -68,66 +114,21 @@ const UserPage = () => {
                         </div>
                     </div>
                     <div>
-                        {data.sort((a: any, b: any) => sortUp ? a.ball - b.ball : b.ball - a.ball).map((d) => (
-                            <Row d={d} key={d.id} />
-                        ))}
+                        {!loading ?
+                            (data.length ? filteredData().map(d => (
+                                <Row d={d} key={d.id} index={index} setIndex={setIndex} onOpen={onOpen} setData={setData} />
+                            )) : <p className="text-center text-base pt-4">Foydalanuvchilar mavjud emas</p>) :
+                            <div className="w-full h-[30vh] flex items-center justify-center">
+                                <Spinner size="md" />
+                            </div>
+                        }
                     </div>
-                    <div className='flex items-center justify-between pt-3 px-4 sm:px-6'>
-                        <Button variant='bordered' radius='sm'
-                            onClick={() => setPage(page > 1 ? page - 1 : page)}>
-                            <p className='hidden sm:flex'>
-                                Previous
-                            </p>
-                            <ArrowUp className='sm:hidden -rotate-90 text-text3 w-5' />
-                        </Button>
-                        <p className='text-base text-[#344054] font-semibold'>{page}/10 Sahifa</p>
-                        <Button variant='bordered' radius='sm'
-                            onClick={() => setPage(page < 10 ? page + 1 : page)}>
-                            <p className='hidden sm:flex'>
-                                Next
-                            </p>
-                            <ArrowUp className='sm:hidden rotate-90 text-text3 w-5' />
-                        </Button>
-                    </div>
+                    {!loading && <Pagination page={page} setPage={setPage} total={filteredData().length} />}
                 </div>
             </div>
-            <AddModal isOpen={isOpen} onClose={onClose} data={data[0]} setData={() => { }} />
+            <AddModal isOpen={isOpen} onClose={onClose} data={data.find(f => f.id === index)} regions={regions} setIndex={setIndex} fetchData={fetchData} />
         </div>
     )
 }
 
 export default UserPage
-
-
-const data = [
-    {
-        id: 0,
-        name: 'Discover invest',
-        ball: 123
-    },
-    {
-        id: 1,
-        name: 'Discover invest',
-        ball: 124
-    },
-    {
-        id: 2,
-        name: 'Discover invest',
-        ball: 125
-    },
-    {
-        id: 3,
-        name: 'Discover invest',
-        ball: 126
-    },
-    {
-        id: 4,
-        name: 'Discover invest',
-        ball: 127
-    },
-    {
-        id: 5,
-        name: 'Discover invest',
-        ball: 128
-    },
-]

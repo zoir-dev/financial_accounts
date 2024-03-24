@@ -1,5 +1,4 @@
 import { Building2, Landmark, Train, Waves } from 'lucide-react'
-import React from 'react'
 
 const Info = () => {
     return (

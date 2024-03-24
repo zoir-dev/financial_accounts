@@ -8,8 +8,6 @@ import { scrollToElement } from '@/utils/scroll';
 import { usePathname, useRouter } from 'next/navigation';
 import { LogOut, Menu, User } from 'lucide-react';
 import dynamic from 'next/dynamic';
-// import Drawer from './Drawer';
-// import dynamic from 'next/dynamic';
 const Drawer = dynamic(() => import('./Drawer'), { ssr: false })
 
 const Header = () => {

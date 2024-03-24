@@ -1,12 +1,37 @@
 'use client'
-import { Button, Input } from '@nextui-org/react'
+import { Button, Input, Spinner, useDisclosure } from '@nextui-org/react'
 import { ArrowUp, Plus, Search } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Row from './Row'
+import AddModal from './AddModal'
+import Pagination from '@/ui/Pagination'
+import { http } from '@/utils/http'
 
 const CategoryPage = () => {
     const [sortUp, setSortUp] = useState(false)
     const [page, setPage] = useState(1)
+    const [index, setIndex] = useState(-1)
+    const [loading, setLoading] = useState(false)
+    const [search, setSearch] = useState('')
+    const { isOpen, onClose, onOpen } = useDisclosure()
+    const [data, setData] = useState<{ id: number, title: string }[]>([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true)
+                await http.get('category').then(res => setData(res.data))
+            } catch (error) {
+            } finally { setLoading(false) }
+        }
+        fetchData()
+    }, [])
+
+    const filteredData = () => {
+        if (!search) return data.sort((a: any, b: any) => sortUp ? a?.ball - b?.ball : b?.ball - a?.ball)
+        return data.filter(f => f.title.toLowerCase().includes(search.toLowerCase()))
+            .sort((a: any, b: any) => sortUp ? a?.ball - b?.ball : b?.ball - a?.ball)
+    }
     return (
         <div className='flex flex-col gap-8'>
             <div className='flex gap-4 lg:items-center justify-between flex-col lg:flex-row'>
@@ -19,8 +44,10 @@ const CategoryPage = () => {
                         }}
                         startContent={<Search className='text-gray-500 w-5' />}
                         className='w-full sm:w-[320px]'
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                     />
-                    <Button color='primary' radius='sm' startContent={<Plus className='!w-5' />} >
+                    <Button color='primary' radius='sm' startContent={<Plus className='!w-5' />} onClick={onOpen} isDisabled={loading} >
                         Kategoriya qo&apos;shish
                     </Button>
                 </div>
@@ -37,29 +64,19 @@ const CategoryPage = () => {
                         <p className=" w-1/4"></p>
                     </div>
                     <div>
-                        {data.sort((a: any, b: any) => sortUp ? a.ball - b.ball : b.ball - a.ball).map((d) => (
-                            <Row d={d} key={d.id} />
-                        ))}
+                        {!loading ?
+                            (data.length ? filteredData().map(d => (
+                                <Row d={d} key={d.id} setIndex={setIndex} onOpen={onOpen} index={index} setData={setData} />
+                            )) : <p className="text-center text-base pt-4">Foydalanuvchilar mavjud emas</p>) :
+                            <div className="w-full h-[30vh] flex items-center justify-center">
+                                <Spinner size="md" />
+                            </div>
+                        }
                     </div>
-                    <div className='flex items-center justify-between pt-3 px-4 sm:px-6'>
-                        <Button variant='bordered' radius='sm'
-                            onClick={() => setPage(page > 1 ? page - 1 : page)}>
-                            <p className='hidden sm:flex'>
-                                Previous
-                            </p>
-                            <ArrowUp className='sm:hidden -rotate-90 text-text3 w-5' />
-                        </Button>
-                        <p className='text-base text-[#344054] font-semibold'>{page}/10 Sahifa</p>
-                        <Button variant='bordered' radius='sm'
-                            onClick={() => setPage(page < 10 ? page + 1 : page)}>
-                            <p className='hidden sm:flex'>
-                                Next
-                            </p>
-                            <ArrowUp className='sm:hidden rotate-90 text-text3 w-5' />
-                        </Button>
-                    </div>
+                    {!loading && <Pagination page={page} setPage={setPage} total={filteredData().length} />}
                 </div>
             </div>
+            <AddModal isOpen={isOpen} setIndex={setIndex} onClose={onClose} data={index >= 0 && data.find(f => f.id === index)} setData={setData} />
         </div>
     )
 }
@@ -70,32 +87,32 @@ export default CategoryPage
 const data = [
     {
         id: 0,
-        name: 'Discover invest',
+        title: 'Discover invest',
         ball: 1
     },
     {
         id: 1,
-        name: 'Discover invest',
+        title: 'Discover invest',
         ball: 1542
     },
     {
         id: 2,
-        name: 'Discover invest',
+        title: 'Discover invest',
         ball: 1543
     },
     {
         id: 3,
-        name: 'Discover invest',
+        title: 'Discover invest',
         ball: 1544
     },
     {
         id: 4,
-        name: 'Discover invest',
+        title: 'Discover invest',
         ball: 1546
     },
     {
         id: 5,
-        name: 'Discover invest',
+        title: 'Discover invest',
         ball: 1547
     }
 ]

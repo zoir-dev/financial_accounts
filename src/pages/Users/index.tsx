@@ -1,33 +1,64 @@
 'use client'
-import { Button, Input } from "@nextui-org/react"
+import { Button, Input, Spinner, useDisclosure } from "@nextui-org/react"
 import { ArrowUp, Plus, Search } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Row from "./Row"
+import { http } from "@/utils/http"
+import toast from "react-hot-toast"
+import AddModal from "./AddModal"
+import Pagination from "@/ui/Pagination"
 
 const UsersPage = () => {
     const [page, setPage] = useState(1)
     const [sortUp, setSortUp] = useState(false)
+    const [data, setData] = useState<any[]>([])
+    const [loading, setLoading] = useState(false)
+    const [search, setSearch] = useState('')
+
+    const { isOpen, onOpen, onClose } = useDisclosure()
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true)
+                await http.get('user').then(res => setData(res.data))
+            } catch (error: any) {
+                toast.error(error.response?.data?.message)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
+
+
+    const filteredData = () => {
+        if (!search) return data.sort((a: any, b: any) => sortUp ? a.full_name.localeCompare(b.full_name) :
+            b.full_name.localeCompare(a.full_name));
+        return data.filter(f => f.full_name?.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+            .sort((a: any, b: any) => sortUp ? a.full_name.localeCompare(b.full_name) : b.full_name.localeCompare(a.full_name))
+    }
 
     return (
         <div>
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <h2 className="title">Foydalanuvchilar</h2>
-                <Button color="primary" radius="sm" startContent={<Plus className="w-5" />}>
+                <Button color="primary" radius="sm" startContent={<Plus className="w-5" />} onClick={onOpen}>
                     Foydalanuvchi qo&apos;shish
                 </Button>
             </div>
             <div className="flex flex-col md:flex-row gap-6 pb-6 pt-8">
                 <div className="p-6 rounded-xl w-full bg-[#ECFDF3]">
                     <p className="text-success-700 text-sm pb-2">Barcha foydalanuvchilar</p>
-                    <span className="text-success-700 text-4xl font-semibold">125</span>
+                    <span className="text-success-700 text-4xl font-semibold">{data.length}</span>
                 </div>
                 <div className="p-6 rounded-xl w-full bg-[#EFF8FF]">
                     <p className="text-[#175CD3] text-sm pb-2">Aktiv foydalanuvchilar</p>
-                    <span className="text-[#175CD3] text-4xl font-semibold">125</span>
+                    <span className="text-[#175CD3] text-4xl font-semibold">{data.filter(f => f?.is_active).length}</span>
                 </div>
                 <div className="p-6 rounded-xl w-full bg-[#FDF2FA]">
                     <p className="text-[#C11574] text-sm pb-2">Obunasi tugagan foydalanuvchilar</p>
-                    <span className="text-[#C11574] text-4xl font-semibold">125</span>
+                    <span className="text-[#C11574] text-4xl font-semibold">{data.filter(f => f?.is_block).length}</span>
                 </div>
             </div>
             <div className="flex flex-col gap-6">
@@ -39,6 +70,8 @@ const UsersPage = () => {
                         }}
                         startContent={<Search className='text-gray-500 w-5' />}
                         className='w-full sm:w-[320px]'
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
                 <div className="overflow-x-auto w-[calc(100%+32px)] -ml-4 sm:w-full sm:!ml-0">
@@ -61,92 +94,23 @@ const UsersPage = () => {
                             </div>
                         </div>
                         <div>
-                            {data.sort((a: any, b: any) => sortUp ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)).map(d => (
-                                <Row d={d} key={d.id} />
-                            ))}
+                            {!loading ?
+                                (data.length ? filteredData().map(d => (
+                                    <Row d={d} key={d.id} />
+                                )) : <p className="text-center text-base pt-4">Foydalanuvchilar mavjud emas</p>) :
+                                <div className="w-full h-[30vh] flex items-center justify-center">
+                                    <Spinner size="md" />
+                                </div>
+                            }
                         </div>
-                        <div className='flex items-center justify-between pt-3 px-4 sm:px-6'>
-                            <Button variant='bordered' radius='sm'
-                                onClick={() => setPage(page > 1 ? page - 1 : page)}>
-                                <p className='hidden sm:flex'>
-                                    Previous
-                                </p>
-                                <ArrowUp className='sm:hidden -rotate-90 text-text3 w-5' />
-                            </Button>
-                            <p className='text-base text-[#344054] font-semibold'>{page}/10 Sahifa</p>
-                            <Button variant='bordered' radius='sm'
-                                onClick={() => setPage(page < 10 ? page + 1 : page)}>
-                                <p className='hidden sm:flex'>
-                                    Next
-                                </p>
-                                <ArrowUp className='sm:hidden rotate-90 text-text3 w-5' />
-                            </Button>
-                        </div>
+                        {!loading && <Pagination page={page} setPage={setPage} total={filteredData().length} />}
                     </div>
                 </div>
             </div>
+            <AddModal isOpen={isOpen} onClose={onClose} setData={setData} />
         </div>
     )
 }
 
 export default UsersPage
 
-
-interface User {
-    id: number,
-    name: string,
-    img: string,
-    phone: string,
-    date: string
-}
-const data: User[] = [
-    {
-        id: 1,
-        name: "Catalog",
-        img: "https://picsum.photos/40",
-        phone: "+998 94 222 22 22",
-        date: "12.02.2025"
-    },
-    {
-        id: 2,
-        name: "Catalog1",
-        img: "https://picsum.photos/40",
-        phone: "+998 94 222 22 22",
-        date: "12.02.2025"
-    },
-    {
-        id: 3,
-        name: "Catalog2",
-        img: "https://picsum.photos/40",
-        phone: "+998 94 222 22 22",
-        date: "12.02.2025"
-    },
-    {
-        id: 4,
-        name: "Catalog3",
-        img: "https://picsum.photos/40",
-        phone: "+998 94 222 22 22",
-        date: "12.02.2025"
-    },
-    {
-        id: 5,
-        name: "Catalog4",
-        img: "https://picsum.photos/40",
-        phone: "+998 94 222 22 22",
-        date: "12.02.2025"
-    },
-    {
-        id: 6,
-        name: "Catalog5",
-        img: "https://picsum.photos/40",
-        phone: "+998 94 222 22 22",
-        date: "12.02.2025"
-    },
-    {
-        id: 7,
-        name: "Catalog6",
-        img: "https://picsum.photos/40",
-        phone: "+998 94 222 22 22",
-        date: "12.02.2025"
-    },
-]

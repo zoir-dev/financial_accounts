@@ -1,4 +1,3 @@
-import React from 'react'
 import Demo from './Demo'
 import Results from './Results'
 import Info from './Info'

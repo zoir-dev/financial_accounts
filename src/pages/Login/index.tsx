@@ -28,6 +28,8 @@ const LoginPage = () => {
             setLoading(true)
             await http.post('auth/signin', form).then(res => {
                 localStorage.setItem('token', res.data.tokens.access_token)
+                localStorage.setItem('adminId', res.data.id)
+                localStorage.setItem('phoneNumber', res.data.phone)
             })
             router.push('/main')
             toast.success("Muvaffaqqiyatli o'tdingiz!")

@@ -1,9 +1,45 @@
 'use client'
+import { http } from '@/utils/http'
 import { Button, Input, Select, SelectItem } from '@nextui-org/react'
 import { Plus, Search } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 const ArchivePage = () => {
+    const [regions, setRegions] = useState<{ id: number, name: string, organizations: any[] }[]>([])
+    const [search, setSearch] = useState({ region: -1, stir: '', name: '' })
+    const [loading, setLoading] = useState(false)
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true)
+                await http.get('region').then(res => setRegions(res.data))
+                await http.get('archive/1').then(res => console.log(res.data))
+            } catch (error) {
+
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
+
+    // const filteredData = () => {
+    //     return data.filter(item => {
+    //         if (search.region !== -1 && item?.region?.id !== search.region) {
+    //             return false;
+    //         }
+    //         if (search.stir && !item?.stir?.toString().includes(search.stir)) {
+    //             return false;
+    //         }
+    //         if (search.name && !item?.name?.toLowerCase().includes(search.name.toLowerCase())) {
+    //             return false;
+    //         }
+    //         return true;
+    //     });
+    // };
+
     return (
         <div>
             <div className='flex items-start sm:items-center justify-between flex-col gap-4 sm:flex-row'>
@@ -18,16 +54,22 @@ const ArchivePage = () => {
                     <span className="text-success-700 text-4xl font-semibold">125</span>
                 </div>
                 <div className='flex items-center flex-col sm:flex-row justify-center gap-2 sm:gap-4 sm:pt-4'>
-                    <Select variant='bordered' color='primary' className='w-full sm:max-w-[320px]' placeholder='Viloyat' radius='sm' classNames={{ value: 'text-base' }} startContent={<Search className='text-gray-500 w-5' />}>
-                        <SelectItem key='1' value='1'>
-                            1
-                        </SelectItem>
-                        <SelectItem key='2' value='2'>
-                            2
-                        </SelectItem>
-                        <SelectItem key='3' value='3'>
-                            3
-                        </SelectItem>
+                    <Select
+                        variant='bordered'
+                        color='primary'
+                        className='w-full max-w-[320px]'
+                        placeholder='Viloyat' radius='sm'
+                        classNames={{ value: 'text-base' }}
+                        aria-label='region select'
+                        startContent={<Search className='text-gray-500 w-5' />}
+                        onSelectionChange={(e: any) => setSearch({ ...search, region: +e.currentKey || -1 })}
+                    >
+                        {regions.map(r => (
+                            <SelectItem key={r.id} value={r.id}>
+                                {r.name}
+                            </SelectItem>
+                        ))}
+
                     </Select>
                     <Input
                         variant='bordered' color='primary' radius='sm' placeholder='STIR'
@@ -35,7 +77,8 @@ const ArchivePage = () => {
                             input: 'text-base'
                         }}
                         startContent={<Search className='text-gray-500 w-5' />}
-                        className='w-full sm:w-full sm:max-w-[320px]'
+                        className='w-full max-w-[320px]'
+                        onChange={(e) => setSearch({ ...search, stir: e.target.value })}
                     />
                     <Input
                         variant='bordered' color='primary' radius='sm' placeholder='Nomi'
@@ -43,7 +86,8 @@ const ArchivePage = () => {
                             input: 'text-base'
                         }}
                         startContent={<Search className='text-gray-500 w-5' />}
-                        className='w-full sm:w-full sm:max-w-[320px]'
+                        className='w-full max-w-[320px]'
+                        onChange={(e) => setSearch({ ...search, name: e.target.value })}
                     />
                 </div>
             </div>

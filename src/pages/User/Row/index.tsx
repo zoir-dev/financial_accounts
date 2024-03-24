@@ -1,23 +1,40 @@
-import { Button } from '@nextui-org/react'
+import { http } from '@/utils/http'
+import { Button, Spinner } from '@nextui-org/react'
 import { Edit2, Trash2 } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
+import toast from 'react-hot-toast'
 
-const Row = ({ d }: { d: any }) => {
+const Row = ({ d, index, setIndex, onOpen, setData }: { d: any, index: number, setIndex: (val: number) => void, onOpen: () => void, setData: (val: any) => void }) => {
+    const [loading, setLoading] = useState(false)
+
+    const deleteRow = async () => {
+        setIndex(d?.id)
+        try {
+            setLoading(true)
+            await http.delete('organization/' + d.id).then(() => setData((val: any[]) => val.filter(f => f.id !== d.id)))
+            setLoading(false)
+            setIndex(-1)
+        } catch (error: any) {
+            toast.error(error.response.data.message)
+            setIndex(-1)
+            setLoading(false)
+        }
+    }
     return (
         <div className='flex items-center justify-between gap-2 px-4 sm:px-6 py-4 border-b-2 border-default-200'>
             <div className="flex items-center w-1/2 sm:w-full">
                 <p className="text-sm">{d?.name}</p>
             </div>
             <div className="text-center w-full flex items-center">
-                <p>{d?.ball}</p>
+                <p className='min-w-8'>{d?.ball}</p>
                 <div className="w-full flex items-center gap-2">
                     <p className='w-full'></p>
                     {getRating(d?.id)}
                     <div className='flex items-center justify-end w-full'>
-                        <Button isIconOnly variant='light'>
-                            <Trash2 className='text-primary w-5' />
+                        <Button isIconOnly variant='light' onClick={() => { setIndex(d?.id), deleteRow() }}>
+                            {(loading && d.id === index) ? <Spinner size='sm' /> : <Trash2 className='text-primary w-5' />}
                         </Button>
-                        <Button isIconOnly variant='light'>
+                        <Button isIconOnly variant='light' onClick={() => { setIndex(d?.id), onOpen() }}>
                             <Edit2 className='text-gray-600 w-5' />
                         </Button>
                     </div>

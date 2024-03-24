@@ -1,28 +1,40 @@
 'use client'
-import { Button, ButtonGroup, Input, useDisclosure } from '@nextui-org/react'
+import { Button, ButtonGroup, Input, Spinner, useDisclosure } from '@nextui-org/react'
 import { ArrowUp, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Row from './Row'
 import Questions from '../Home/Questions'
 import RowModal from './Row/RowModal'
 import { http } from '@/utils/http'
+import toast from 'react-hot-toast'
+import Pagination from '@/ui/Pagination'
 
 const MainPage = () => {
     const [page, setPage] = useState(1)
     const { isOpen, onClose, onOpen } = useDisclosure()
-    // const [data, setData] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [sortUp, setSortUp] = useState(true)
+    const [data, setData] = useState<any[]>([])
+    const [index, setIndex] = useState(-1)
+    const [search, setSearch] = useState('')
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true)
+                await http.get('home/partner').then(d => setData(d.data))
+            } catch (error: any) {
+                toast.error(error.response.data.message)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
 
-    // useEffect(() => {
-    //     const fetchData = () => {
-    //         try {
-    //             http.get('organization').then(d => console.log(d.data))
-    //         } catch (error: any) {
-    //             console.log(error.response.data.message)
-
-    //         }
-    //     }
-    //     fetchData()
-    // }, [])
+    const filteredData = () => {
+        if (!search) return data
+        return data.filter(d => d.name.toLowerCase().includes(search.toLocaleLowerCase()))
+    }
 
     return (
         <div className='pb-16'>
@@ -33,13 +45,13 @@ const MainPage = () => {
             <div className='flex gap-12 lg:items-center justify-between pb-6 flex-col lg:flex-row'>
                 <div className='flex items-center gap-8 lg:gap-4'>
                     <ButtonGroup color='primary' radius='sm'>
-                        <Button className='justify-end'>
+                        <Button className='justify-end' onClick={() => setSortUp(true)}>
                             <ArrowUp />
                         </Button>
                         <Button className='text-[#E0E0E0] text-xl' isIconOnly>
-                            00
+                            {data.length}
                         </Button>
-                        <Button className='justify-start'>
+                        <Button className='justify-start' onClick={() => setSortUp(false)}>
                             <ArrowUp className='rotate-180' />
                         </Button>
                     </ButtonGroup>
@@ -58,6 +70,8 @@ const MainPage = () => {
                         }}
                         startContent={<Search className='text-gray-500 w-5' />}
                         className='w-full sm:w-[320px]'
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
             </div>
@@ -67,30 +81,16 @@ const MainPage = () => {
                     <ArrowUp className='rotate-180 w-4' />
                 </div>
                 <div>
-                    {data.map(d => (
-                        <Row d={d} key={d.id} />
-                    ))}
+                    {!loading ? filteredData()?.sort((a, b) => sortUp ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)).slice(page * 6 - 6, page * 6).map(d => (
+                        <Row d={d} key={d.id} setData={setData} index={index} setIndex={setIndex} onOpen={onOpen} />
+                    )) : <div className='flex items-center justify-center w-full h-[40vh]'>
+                        <Spinner size='md' />
+                    </div>}
                 </div>
-                <div className='flex items-center justify-between pt-3 px-4 sm:px-6'>
-                    <Button variant='bordered' radius='sm'
-                        onClick={() => setPage(page > 1 ? page - 1 : page)}>
-                        <p className='hidden sm:flex'>
-                            Previous
-                        </p>
-                        <ArrowUp className='sm:hidden -rotate-90 text-text3 w-5' />
-                    </Button>
-                    <p className='text-base text-[#344054] font-semibold'>{page}/10 Sahifa</p>
-                    <Button variant='bordered' radius='sm'
-                        onClick={() => setPage(page < 10 ? page + 1 : page)}>
-                        <p className='hidden sm:flex'>
-                            Next
-                        </p>
-                        <ArrowUp className='sm:hidden rotate-90 text-text3 w-5' />
-                    </Button>
-                </div>
+                {!loading && <Pagination page={page} setPage={setPage} total={filteredData().length} />}
             </div>
             <Questions admin={true} />
-            <RowModal isOpen={isOpen} onClose={onClose} />
+            <RowModal isOpen={isOpen} onClose={onClose} setData={setData} data={data.find(d => d.id === index)} setIndex={setIndex} />
         </div>
     )
 }
@@ -98,35 +98,47 @@ const MainPage = () => {
 export default MainPage
 
 
-const data = [
+const dataa = [
     {
         id: 1,
-        img: 'https://picsum.photos/40',
-        title: "Turon qurilish kompaniyasi",
-        des: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.1"
+        log_url: 'https://picsum.photos/40',
+        name: "Turon qurilish kompaniyasi1",
+        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.1"
     },
     {
         id: 2,
-        img: 'https://picsum.photos/40',
-        title: "Turon qurilish kompaniyasi",
-        des: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.2"
+        log_url: 'https://picsum.photos/40',
+        name: "Turon qurilish kompaniyasi2",
+        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.2"
     },
     {
         id: 3,
-        img: 'https://picsum.photos/40',
-        title: "Turon qurilish kompaniyasi",
-        des: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.3"
+        log_url: 'https://picsum.photos/40',
+        name: "Turon qurilish kompaniyasi3",
+        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.3"
     },
     {
         id: 4,
-        img: 'https://picsum.photos/40',
-        title: "Turon qurilish kompaniyasi",
-        des: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.4"
+        log_url: 'https://picsum.photos/40',
+        name: "Turon qurilish kompaniyasi4",
+        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.4"
     },
     {
         id: 5,
-        img: 'https://picsum.photos/40',
-        title: "Turon qurilish kompaniyasi",
-        des: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.5"
+        log_url: 'https://picsum.photos/40',
+        name: "Turon qurilish kompaniyasi5",
+        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.5"
+    },
+    {
+        id: 6,
+        log_url: 'https://picsum.photos/40',
+        name: "Turon qurilish kompaniyasi6",
+        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.5"
+    },
+    {
+        id: 7,
+        log_url: 'https://picsum.photos/40',
+        name: "Turon qurilish kompaniyasi7",
+        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.5"
     },
 ]

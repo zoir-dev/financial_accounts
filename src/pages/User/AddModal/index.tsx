@@ -1,21 +1,58 @@
+import { http } from '@/utils/http'
 import { Button, Input, Modal, ModalBody, ModalContent, ModalHeader, Select, SelectItem } from '@nextui-org/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
-const AddModal = ({ isOpen, onClose, data, setData }: { isOpen: boolean, onClose: () => void, data: any, setData: (val: any) => void }) => {
+const AddModal = ({ isOpen, onClose, data, regions, setIndex, fetchData }: thisProps) => {
     const [loading, setLoading] = useState(false)
     const {
         reset,
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<{ name: string, stir: string, region: number, category: string }>()
+    } = useForm<{ name: string, stir: number, region: number, category: number }>()
 
-    const onSubmit = (form: any) => {
 
+    const [category, setCategory] = useState<{ id: number, title: string }[]>([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await http.get('category').then(res => setCategory(res.data))
+            } catch (error) {
+            }
+        }
+        fetchData()
+    }, [])
+
+    const onSubmit = async (form: any) => {
+        const newForm = {
+            name: form.name,
+            stir: +form.stir,
+            region: +form.region,
+            category: +form.category
+        }
+        try {
+            setLoading(true)
+            if (data) {
+                await http.put('organization/' + data?.id, newForm)
+                toast.success("Muvaffaqqiyatli tahrirlandi")
+            } else {
+                await http.post('organization', newForm)
+                toast.success("Muvaffaqqiyatli qo'shildi")
+            }
+            onClose()
+            fetchData()
+        } catch (error: any) {
+            toast.error(error.response.data.message)
+        } finally {
+            setLoading(false)
+            setIndex(-1)
+        }
     }
     return (
-        <Modal isOpen={isOpen} onClose={() => { onClose(), reset() }} isDismissable={false} size='lg' backdrop='blur'
+        <Modal isOpen={isOpen} onClose={() => { onClose(), reset(), setIndex(-1) }} isDismissable={false} size='lg' backdrop='blur'
             className='pb-5'
             placement='center'
             motionProps={{
@@ -61,6 +98,7 @@ const AddModal = ({ isOpen, onClose, data, setData }: { isOpen: boolean, onClose
                             variant='bordered'
                             placeholder='STIR'
                             label='STIR'
+                            type='phone'
                             labelPlacement='outside'
                             color='primary'
                             classNames={{ label: "text-[#344054]" }}
@@ -83,19 +121,14 @@ const AddModal = ({ isOpen, onClose, data, setData }: { isOpen: boolean, onClose
                                 required: 'Viloyat nomini tanlang'
                             })}
                             isInvalid={!!errors.region}
-                            // errorMessage={errors.region && errors.region?.message}
-                            defaultSelectedKeys={data?.region}
+                            defaultSelectedKeys={[`${data?.region?.id}`]}
                             isDisabled={loading}
                         >
-                            <SelectItem key='1' value='1'>
-                                1
-                            </SelectItem>
-                            <SelectItem key='2' value='2'>
-                                2
-                            </SelectItem>
-                            <SelectItem key='3' value='3'>
-                                3
-                            </SelectItem>
+                            {regions.map(r => (
+                                <SelectItem key={+r.id} value={+r.id}>
+                                    {r.name}
+                                </SelectItem>
+                            ))}
                         </Select>
                         <Select
                             variant='bordered'
@@ -110,22 +143,17 @@ const AddModal = ({ isOpen, onClose, data, setData }: { isOpen: boolean, onClose
                                 required: 'Kategoriya tanlang'
                             })}
                             isInvalid={!!errors.category}
-                            // errorMessage={errors.category && errors.category?.message}
-                            defaultSelectedKeys={data?.category}
+                            defaultSelectedKeys={[`${data?.category?.id}`]}
                             isDisabled={loading}
                         >
-                            <SelectItem key='1' value='1'>
-                                1
-                            </SelectItem>
-                            <SelectItem key='2' value='2'>
-                                2
-                            </SelectItem>
-                            <SelectItem key='3' value='3'>
-                                3
-                            </SelectItem>
+                            {category.map(c => (
+                                <SelectItem key={+c.id} value={+c.id}>
+                                    {c.title}
+                                </SelectItem>
+                            ))}
                         </Select>
                         <div className='flex gap-3 pt-5'>
-                            <Button variant='bordered' radius='sm' onClick={() => { onClose(), reset() }} isDisabled={loading} fullWidth>
+                            <Button variant='bordered' radius='sm' onClick={() => { onClose(), reset(), setIndex(-1) }} isDisabled={loading} fullWidth>
                                 Bekor qilish
                             </Button>
                             <Button color='primary' radius='sm' type='submit' isLoading={loading} fullWidth>Saqlash</Button>
@@ -138,3 +166,14 @@ const AddModal = ({ isOpen, onClose, data, setData }: { isOpen: boolean, onClose
 }
 
 export default AddModal
+
+
+
+interface thisProps {
+    isOpen: boolean,
+    onClose: () => void,
+    data: any,
+    regions: { id: number, name: string, organizations: any[] }[],
+    setIndex: (val: number) => void,
+    fetchData: () => void
+}

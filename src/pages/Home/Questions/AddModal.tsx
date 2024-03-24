@@ -28,7 +28,7 @@ const AddModal = ({ isOpen, onClose, data, setData }: { isOpen: boolean, onClose
             }
             onClose()
         } catch (error: any) {
-            toast.error(error.message)
+            toast.error(error.response.data.message)
         } finally {
             setLoading(false)
         }

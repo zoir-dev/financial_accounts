@@ -40,8 +40,8 @@ const Questions = ({ admin }: { admin?: boolean }) => {
             setData(d => d.filter(d => d.id !== id))
             setDeletingId(-1)
         } catch (error: any) {
-            toast.error(error.message)
-
+            toast.error(error.response.data.message)
+            setLoading(false)
         }
     }
 
