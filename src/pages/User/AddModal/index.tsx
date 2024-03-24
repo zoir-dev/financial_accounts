@@ -124,7 +124,7 @@ const AddModal = ({ isOpen, onClose, data, regions, setIndex, fetchData }: thisP
                             defaultSelectedKeys={[`${data?.region?.id}`]}
                             isDisabled={loading}
                         >
-                            {regions.map(r => (
+                            {regions?.map(r => (
                                 <SelectItem key={+r.id} value={+r.id}>
                                     {r.name}
                                 </SelectItem>
@@ -146,7 +146,7 @@ const AddModal = ({ isOpen, onClose, data, regions, setIndex, fetchData }: thisP
                             defaultSelectedKeys={[`${data?.category?.id}`]}
                             isDisabled={loading}
                         >
-                            {category.map(c => (
+                            {category?.map(c => (
                                 <SelectItem key={+c.id} value={+c.id}>
                                     {c.title}
                                 </SelectItem>
