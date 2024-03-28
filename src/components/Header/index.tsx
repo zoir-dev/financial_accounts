@@ -8,6 +8,7 @@ import { scrollToElement } from '@/utils/scroll';
 import { usePathname, useRouter } from 'next/navigation';
 import { LogOut, Menu, User } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import toast from 'react-hot-toast';
 const Drawer = dynamic(() => import('./Drawer'), { ssr: false })
 
 const Header = () => {
@@ -30,10 +31,18 @@ const Header = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [pathName]);
 
-    const logOut = () => {
-        localStorage.removeItem('token')
-        router.push('/')
+    const logOut = async () => {
+        try {
+            // await http.post('admin/logout')
+            localStorage.clear()
+            router.push('/')
+        } catch (error: any) {
+            toast.error(error.response.data.message)
+        }
     }
+
+    const phoneNumber = typeof window !== 'undefined' && localStorage.getItem('phoneNumber')
+
 
     const classNames = {
         tabList: 'flex-col lg:flex-row',
@@ -41,6 +50,17 @@ const Header = () => {
         cursor: `!bg-primary py-5 mt-[-4px] shadow-none ${scrolled && '!bg-white'}`,
         tabContent: `group-data-[selected=true]:text-white text-primary ${scrolled && "group-data-[selected=true]:text-primary text-white"}`
     }
+
+    const dynamics = [
+        {
+            name: '/users',
+            href: '/users/'
+        },
+        {
+            name: '/archives',
+            href: '/archives/'
+        }
+    ]
 
     return (
         <div className={`${!scrolled ? 'bg-white' : 'bg-primary'} w-full py-4 fixed z-10 top-0 duration-250`}>
@@ -72,11 +92,13 @@ const Header = () => {
                             color='primary'
                             classNames={classNames}
                             onSelectionChange={(e) => router.push(`${e}`)}
-                            selectedKey={pathName}
+                            selectedKey={dynamics.find(f => pathName?.includes(f.href))?.name ?? pathName}
                             className='hidden lg:flex'
                         >
                             {links.map(l => (
-                                <Tab key={l.href} title={l.name} />
+                                <Tab key={l.href} title={l.name} onClick={() => router.push(l.href)}
+                                    className={dynamics.find(f => (l.href === f.name && pathName?.includes(f.href)))?.name ? 'opacity-50' : ''}
+                                />
                             ))}
                         </Tabs>
                     }
@@ -101,7 +123,7 @@ const Header = () => {
                         <DropdownMenu variant='light' aria-label='actions'>
                             <DropdownItem className='border-b border-white rounded-none pb-3'>
                                 <p className='font-semibold !text-white' key='number'>
-                                    +998 94 222 22 22
+                                    {phoneNumber}
                                 </p>
                             </DropdownItem>
                             <DropdownItem onClick={logOut} key='action'>
@@ -114,7 +136,7 @@ const Header = () => {
                 }
                 <Menu className={`text-primary ${scrolled && 'text-white'} cursor-pointer lg:hidden`} onClick={() => setOpen(true)} />
             </div>
-            <Drawer open={open} setOpen={setOpen} classNames={classNames} links={links} />
+            <Drawer open={open} setOpen={setOpen} classNames={classNames} links={links} phoneNumber={phoneNumber} dynamics={dynamics} />
         </div>
     );
 };
@@ -124,8 +146,8 @@ export default Header;
 
 const links = [
     {
-        name: 'Arxivlar',
-        href: '/archive',
+        name: "Arxiv",
+        href: '/archives'
     },
     {
         name: 'Tashkilot',

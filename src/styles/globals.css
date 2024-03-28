@@ -26,5 +26,5 @@ button {
 }
 
 .title {
-  @apply font-semibold text-2xl sm:text-3xl xl:text-4xl;
+  @apply font-semibold text-xl sm:text-2xl xl:text-3xl;
 }

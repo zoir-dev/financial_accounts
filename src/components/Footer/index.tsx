@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import logo from '@/assets/logo.png'
 import { Facebook, Github, Linkedin, Twitter } from 'lucide-react'
+import { scrollToElement } from '@/utils/scroll'
 const Footer = () => {
     return (
         <footer className='w-full bg-primary pt-12 sm:pt-16 pb-12 text-white'>
@@ -19,7 +20,7 @@ const Footer = () => {
                     <div className="flex flex-col mr-auto gap-[16px]">
                         <p className="text-[#D0D5DD] font-semibold">Ma&apos;lumotlar</p>
                         <Link href=''>Biz haqimizda</Link>
-                        <Link href=''>Hamkorlar</Link>
+                        <p className='cursor-pointer' onClick={() => scrollToElement('partner')}>Hamkorlar</p>
                         <Link href=''>Xizmatlar</Link>
                     </div>
                     <div className="flex flex-col mr-auto gap-[16px]">

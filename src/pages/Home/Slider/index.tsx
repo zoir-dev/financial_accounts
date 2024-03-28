@@ -20,17 +20,26 @@ function Slider() {
     // });
 
     useEffect(() => {
-        http.get('home/partner').then(res => setData(res.data))
+        const fetchData = () => {
+            try {
+                http.get('home/partner').then(res => setData(res.data))
+            } catch (error: any) {
+                console.log(error.response.data.message)
+
+            }
+        }
+        fetchData()
     }, [])
+
     useEffect(() => {
-        if (data.length) {
+        if (data.length > 2) {
             sliderRef.current.click()
         }
     }, [data.length])
 
 
     return (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8" id="partner">
             <Swiper
                 centeredSlides={true}
                 slidesPerView={'auto'}
@@ -57,7 +66,7 @@ function Slider() {
                 {data &&
                     data?.map((partner: any) => {
                         return (
-                            <SwiperSlide key={partner.id} className="w-[100%]  sm:!w-[1180px] !duration-1000 !transition-all ">
+                            <SwiperSlide key={partner.id} className="w-[100%] max-w-[1180px] !duration-1000 !transition-all ">
                                 <div className="bg-[#C35427]  flex flex-col lg:text-left lg:flex-row px-5 py-[30px] md:py-[97px] rounded-[25px]">
                                     <div className="md:w-[601px] flex flex-col lg:justify-start">
                                         <h2 className="leading-[38px] md:leading-[60px] text-[30px] md:text-[35px] pb-[32px] md:pb-[48px] text-white">
@@ -65,7 +74,7 @@ function Slider() {
                                         </h2>
                                         <div className="flex items-center gap-[12px] pb-[50px] lg:pb-0 mt-auto">
                                             <Image
-                                                className="rounded-[15px]"
+                                                className="rounded-[15px] object-cover"
                                                 src={partner.logo_url}
                                                 alt=""
                                                 width={56}
@@ -77,6 +86,7 @@ function Slider() {
                                     <div className="lg:ml-auto px-[30px] md:px-[69px] bg-white flex justify-center rounded-[15px]">
                                         <Image
                                             src={partner.logo_url} alt=""
+                                            className="object-cover"
                                             width={314}
                                             height={100}
                                         />

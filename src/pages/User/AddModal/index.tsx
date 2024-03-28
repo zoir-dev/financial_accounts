@@ -76,7 +76,7 @@ const AddModal = ({ isOpen, onClose, data, regions, setIndex, fetchData }: thisP
                 }
             }}>
             <ModalContent>
-                <ModalHeader>Tashkilot qo&apos;shish</ModalHeader>
+                <ModalHeader>Tashkilot {data ? 'tahrirlash' : "qo'shish"}</ModalHeader>
                 <ModalBody>
                     <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-3'>
                         <Input

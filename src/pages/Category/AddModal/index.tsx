@@ -59,7 +59,7 @@ const AddModal = ({ isOpen, onClose, data, setData, setIndex }: thisProps) => {
                 }
             }}>
             <ModalContent>
-                <ModalHeader>Foydalanuvchi qo&apos;shish</ModalHeader>
+                <ModalHeader>Kategoriya {data ? 'tahrirlash' : "qo'shish"}</ModalHeader>
                 <ModalBody>
                     <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-3'>
                         <Input

@@ -27,15 +27,17 @@ const LoginPage = () => {
         try {
             setLoading(true)
             await http.post('auth/signin', form).then(res => {
+                console.log(res.data)
                 localStorage.setItem('token', res.data.tokens.access_token)
-                localStorage.setItem('adminId', res.data.id)
-                localStorage.setItem('phoneNumber', res.data.phone)
+                localStorage.setItem('adminId', res.data.person.id)
+                localStorage.setItem('phoneNumber', res.data.person.phone)
+                localStorage.setItem('refresh_token', res.data.tokens.refresh_token)
             })
             router.push('/main')
             toast.success("Muvaffaqqiyatli o'tdingiz!")
             reset()
         } catch (error: any) {
-            toast.error(error.response?.data?.message || error.message)
+            toast.error(error.response?.data?.message || error?.message)
         } finally {
             setLoading(false)
         }
@@ -59,7 +61,7 @@ const LoginPage = () => {
                             labelPlacement='outside'
                             color='primary'
                             type='phone'
-                            defaultValue='+998931234567'
+                            defaultValue='+998913971237'
                             classNames={{
                                 label: "font-semibold text-text3",
                                 inputWrapper: 'bg-white'
@@ -83,7 +85,7 @@ const LoginPage = () => {
                             type='password'
                             labelPlacement='outside'
                             color='primary'
-                            defaultValue='IWUH0Zoz'
+                            defaultValue='glpat-uh66UcS2ypWrXFZUtkWv'
                             classNames={{
                                 label: "font-semibold text-text3",
                                 inputWrapper: "bg-white"

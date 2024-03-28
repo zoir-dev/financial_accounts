@@ -4,10 +4,11 @@ import { ArrowUp, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Row from './Row'
 import Questions from '../Home/Questions'
-import RowModal from './Row/RowModal'
 import { http } from '@/utils/http'
 import toast from 'react-hot-toast'
 import Pagination from '@/ui/Pagination'
+import { useRouter } from 'next/navigation'
+import AddModal from './AddModal'
 
 const MainPage = () => {
     const [page, setPage] = useState(1)
@@ -17,23 +18,33 @@ const MainPage = () => {
     const [data, setData] = useState<any[]>([])
     const [index, setIndex] = useState(-1)
     const [search, setSearch] = useState('')
+
+    const router = useRouter()
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true)
                 await http.get('home/partner').then(d => setData(d.data))
             } catch (error: any) {
-                toast.error(error.response.data.message)
+                if (error?.response?.data?.message === 'Topilmadi') {
+                    localStorage.clear()
+                    router.push('/')
+                } else {
+                    toast.error(error?.response?.data?.message || error?.message)
+                }
             } finally {
                 setLoading(false)
             }
         }
         fetchData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const filteredData = () => {
-        if (!search) return data
+        if (!search) return data.sort((a, b) => sortUp ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)).slice(page * 6 - 6, page * 6)
         return data.filter(d => d.name.toLowerCase().includes(search.toLocaleLowerCase()))
+            .sort((a, b) => sortUp ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)).slice(page * 6 - 6, page * 6)
     }
 
     return (
@@ -76,69 +87,24 @@ const MainPage = () => {
                 </div>
             </div>
             <div className='py-4 rounded-xl border-2 border-default-200 mb-12 w-[calc(100%+32px)] -ml-4 sm:w-full sm:!ml-0'>
-                <div className='text-gray-600 flex items-center gap-2 pb-3 border-b-2 border-default-200 px-4  sm:px-6'>
+                <div className='text-gray-600 flex items-center gap-2 pb-3 border-b-2 border-default-200 px-4 cursor-pointer  sm:px-6'
+                    onClick={() => setSortUp(!sortUp)}>
                     <p>Feedback</p>
-                    <ArrowUp className='rotate-180 w-4' />
+                    <ArrowUp className={`${sortUp ? 'rotate-0' : 'rotate-180'} duration-250 w-4`} />
                 </div>
                 <div>
-                    {!loading ? filteredData()?.sort((a, b) => sortUp ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)).slice(page * 6 - 6, page * 6).map(d => (
+                    {!loading ? filteredData()?.map(d => (
                         <Row d={d} key={d.id} setData={setData} index={index} setIndex={setIndex} onOpen={onOpen} />
                     )) : <div className='flex items-center justify-center w-full h-[40vh]'>
                         <Spinner size='md' />
                     </div>}
                 </div>
-                {!loading && <Pagination page={page} setPage={setPage} total={filteredData().length} />}
+                {!loading && data.length > 0 && <Pagination page={page} setPage={setPage} total={filteredData()?.length} />}
             </div>
             <Questions admin={true} />
-            <RowModal isOpen={isOpen} onClose={onClose} setData={setData} data={data.find(d => d.id === index)} setIndex={setIndex} />
+            <AddModal isOpen={isOpen} onClose={onClose} setData={setData} data={data.find(d => d.id === index)} setIndex={setIndex} />
         </div>
     )
 }
 
 export default MainPage
-
-
-const dataa = [
-    {
-        id: 1,
-        log_url: 'https://picsum.photos/40',
-        name: "Turon qurilish kompaniyasi1",
-        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.1"
-    },
-    {
-        id: 2,
-        log_url: 'https://picsum.photos/40',
-        name: "Turon qurilish kompaniyasi2",
-        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.2"
-    },
-    {
-        id: 3,
-        log_url: 'https://picsum.photos/40',
-        name: "Turon qurilish kompaniyasi3",
-        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.3"
-    },
-    {
-        id: 4,
-        log_url: 'https://picsum.photos/40',
-        name: "Turon qurilish kompaniyasi4",
-        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.4"
-    },
-    {
-        id: 5,
-        log_url: 'https://picsum.photos/40',
-        name: "Turon qurilish kompaniyasi5",
-        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.5"
-    },
-    {
-        id: 6,
-        log_url: 'https://picsum.photos/40',
-        name: "Turon qurilish kompaniyasi6",
-        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.5"
-    },
-    {
-        id: 7,
-        log_url: 'https://picsum.photos/40',
-        name: "Turon qurilish kompaniyasi7",
-        thought: "information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.information about reactions to a product, a person's performance of a task, etc. which is used as a basis for improvement.5"
-    },
-]

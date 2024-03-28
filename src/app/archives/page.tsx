@@ -1,8 +1,8 @@
-import ArchivePage from '@/pages/Archive'
+import ArchivesPage from '@/pages/Archives'
 
 const Archive = () => {
     return (
-        <ArchivePage />
+        <ArchivesPage />
     )
 }
 

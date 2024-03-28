@@ -23,7 +23,7 @@ const UsersPage = () => {
                 setLoading(true)
                 await http.get('user').then(res => setData(res.data))
             } catch (error: any) {
-                toast.error(error.response?.data?.message)
+                toast.error(error.response?.data?.message || error.message)
             } finally {
                 setLoading(false)
             }
@@ -78,10 +78,10 @@ const UsersPage = () => {
                     <div className='py-4 rounded-xl border-2 border-default-200 mb-12 min-w-[550px]'>
                         <div className='text-gray-600 flex items-center justify-between gap-2 pb-3 border-b-2 border-default-200 px-4 sm:px-6 select-none'>
                             <div className="flex items-center w-full">
-                                <div className="flex items-center gap-3">
-                                    <p className="font-semibold text-sm text-black">Raqam</p>
+                                <div className="flex items-center w-full gap-5 sm:gap-11">
+                                    <p className="font-semibold text-sm text-black">Id</p>
                                     <div className="flex items-center gap-1 cursor-pointer w-max" onClick={() => setSortUp(!sortUp)}>
-                                        <p className="text-sm text-gray-600">Logo va kompaniya nomi</p>
+                                        <p className="text-sm w-full text-gray-600">To&apos;liq ismi</p>
                                         <ArrowUp className={`w-4 text-gray-600 duration-250 ${!sortUp && 'rotate-180'}`} />
                                     </div>
                                 </div>
@@ -95,7 +95,7 @@ const UsersPage = () => {
                         </div>
                         <div>
                             {!loading ?
-                                (data.length ? filteredData().map(d => (
+                                (data.length ? filteredData().slice(page * 6 - 6, page * 6).map(d => (
                                     <Row d={d} key={d.id} />
                                 )) : <p className="text-center text-base pt-4">Foydalanuvchilar mavjud emas</p>) :
                                 <div className="w-full h-[30vh] flex items-center justify-center">
@@ -103,7 +103,7 @@ const UsersPage = () => {
                                 </div>
                             }
                         </div>
-                        {!loading && <Pagination page={page} setPage={setPage} total={filteredData().length} />}
+                        {!loading && data.length > 0 && <Pagination page={page} setPage={setPage} total={filteredData().length} />}
                     </div>
                 </div>
             </div>

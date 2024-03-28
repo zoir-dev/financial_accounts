@@ -1,42 +1,39 @@
 'use client'
+import { http } from '@/utils/http'
+import { Button, Input, Select, SelectItem, Spinner } from '@nextui-org/react'
 import { ArrowUp, Plus, Search } from 'lucide-react'
-import { Button, Input, Select, SelectItem, Spinner, useDisclosure } from '@nextui-org/react'
 import { useEffect, useState } from 'react'
 import Row from './Row'
-import AddModal from './AddModal'
-import { http } from '@/utils/http'
-import Pagination from '@/ui/Pagination'
 import toast from 'react-hot-toast'
+import Pagination from '@/ui/Pagination'
 
-const UserPage = () => {
-    const [page, setPage] = useState(1)
-    const [sortUp, setSortUp] = useState(false)
-    const [index, setIndex] = useState(-1)
-    const [search, setSearch] = useState({ region: -1, stir: '', name: '' })
+const ArchivesPage = () => {
     const [regions, setRegions] = useState<{ id: number, name: string, organizations: any[] }[]>([])
-    const [data, setData] = useState<any[]>([])
+    const [search, setSearch] = useState({ region: -1, stir: '', name: '' })
     const [loading, setLoading] = useState(false)
+    const [data, setData] = useState<any[]>([])
+    const [sortUp, setSortUp] = useState(false)
+    const [page, setPage] = useState(1)
 
-    const { isOpen, onClose, onOpen } = useDisclosure()
 
-    const fetchData = async () => {
-        try {
-            setLoading(true)
-            await http.get('organization').then(res => setData(res.data))
-            await http.get('region').then(res => setRegions(res.data))
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message || error?.message)
-        } finally {
-            setLoading(false)
-        }
-    }
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true)
+                await http.get('region').then(res => setRegions(res.data))
+                await http.get('archive/all').then(res => setData(res.data))
+            } catch (error: any) {
+                toast.error(error?.response?.data?.message || error?.message)
+            } finally {
+                setLoading(false)
+            }
+        }
         fetchData()
     }, [])
 
     const filteredData = () => {
         return data.filter(item => {
-            if (search.region !== -1 && item?.region?.id !== search.region) {
+            if (search.region !== -1 && item?.organization?.region?.id !== search.region) {
                 return false;
             }
             if (search.stir && !item?.stir?.toString().includes(search.stir)) {
@@ -46,20 +43,23 @@ const UserPage = () => {
                 return false;
             }
             return true;
-        }).sort((a: any, b: any) => sortUp ? a.category?.title?.localeCompare(b.category?.title) : b.category?.title?.localeCompare(a.category?.title))
+        }).sort((a: any, b: any) => sortUp ? a?.organization?.name.localeCompare(b?.organization?.name)
+            : b?.organization?.name.localeCompare(a?.organization?.name));
     };
 
     return (
-        <div className='flex flex-col gap-8'>
-            <div className='flex gap-4 lg:items-center justify-between flex-col lg:flex-row'>
-                <h2 className="title">
-                    Tashkilot
-                </h2>
-                <div className='flex items-start sm:items-center flex-col-reverse sm:flex-row gap-6 sm:gap-4'>
+        <div>
+            <h2 className="title">Arxivlar</h2>
+            <div className='flex flex-col sm:flex-col-reverse gap-8 py-8'>
+                <div className="p-6 rounded-xl sm:w-max bg-[#ECFDF3]">
+                    <p className="text-success-700 text-sm pb-2">Barcha arxivlar</p>
+                    <span className="text-success-700 text-4xl font-semibold">{data?.length}</span>
+                </div>
+                <div className='flex items-center flex-col sm:flex-row justify-center gap-2 sm:gap-4 sm:pt-4'>
                     <Select
                         variant='bordered'
                         color='primary'
-                        className='w-[180px] hidden md:flex'
+                        className='w-full sm:max-w-[320px]'
                         placeholder='Viloyat' radius='sm'
                         classNames={{ value: 'text-base' }}
                         aria-label='region select'
@@ -79,7 +79,7 @@ const UserPage = () => {
                             input: 'text-base'
                         }}
                         startContent={<Search className='text-gray-500 w-5' />}
-                        className='w-full sm:w-[180px] hidden md:flex'
+                        className='w-full sm:max-w-[320px]'
                         onChange={(e) => setSearch({ ...search, stir: e.target.value })}
                     />
                     <Input
@@ -88,37 +88,30 @@ const UserPage = () => {
                             input: 'text-base'
                         }}
                         startContent={<Search className='text-gray-500 w-5' />}
-                        className='w-full sm:w-[180px]'
+                        className='w-full sm:max-w-[320px]'
                         onChange={(e) => setSearch({ ...search, name: e.target.value })}
                     />
-                    <Button color='primary' radius='sm' startContent={<Plus />} onClick={onOpen}>
-                        Tashkilot q&apos;shish
-                    </Button>
                 </div>
             </div>
             <div className="overflow-x-auto w-[calc(100%+32px)] -ml-4 sm:w-full sm:!ml-0">
                 <div className='py-4 rounded-xl border-2 border-default-200 mb-12 min-w-[550px]'>
                     <div className='text-gray-600 flex items-center justify-between gap-4 pb-3 border-b-2 border-default-200 px-4 sm:px-6 select-none'>
-                        <div className="flex items-center w-1/2 sm:w-full">
-                            <p className="text-sm">Nomi</p>
-                        </div>
-                        <div className="text-center w-full flex items-center gap-4">
+                        <div className="flex items-center w-full">
                             <div className="flex items-center gap-1 cursor-pointer w-max" onClick={() => setSortUp(!sortUp)}>
-                                <p className="text-sm text-gray-600">Kategoriya</p>
+                                <p className="text-sm">Nomi</p>
                                 <ArrowUp className={`w-4 text-gray-600 duration-250 ${!sortUp && 'rotate-180'}`} />
                             </div>
-                            <div className="w-full">
-                                <p></p>
-                                <p className="text-sm text-gray-600">Viloyat</p>
-                                <p className=""></p>
-                            </div>
+                        </div>
+                        <div className="text-center w-full flex items-center justify-between gap-4">
+                            <p className="text-sm">Viloyat</p>
+                            <p className="text-sm text-gray-600">Reyting</p>
                         </div>
                     </div>
                     <div>
                         {!loading ?
                             (data.length ? filteredData().slice(page * 6 - 6, page * 6).map(d => (
-                                <Row d={d} key={d.id} index={index} setIndex={setIndex} onOpen={onOpen} setData={setData} />
-                            )) : <p className="text-center text-base pt-4">Tashkilotlar mavjud emas</p>) :
+                                <Row d={d} key={d.id} />
+                            )) : <p className="text-center text-base pt-4">Arxivlar mavjud emas</p>) :
                             <div className="w-full h-[30vh] flex items-center justify-center">
                                 <Spinner size="md" />
                             </div>
@@ -127,9 +120,8 @@ const UserPage = () => {
                     {!loading && data.length > 0 && <Pagination page={page} setPage={setPage} total={filteredData().length} />}
                 </div>
             </div>
-            <AddModal isOpen={isOpen} onClose={onClose} data={data.find(f => f.id === index)} regions={regions} setIndex={setIndex} fetchData={fetchData} />
         </div>
     )
 }
 
-export default UserPage
+export default ArchivesPage

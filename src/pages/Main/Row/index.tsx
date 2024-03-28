@@ -25,7 +25,7 @@ const Row = ({ d, setData, index, setIndex, onOpen }: { d: any, setData: (val: a
     }
 
     return (
-        <div className='py-6 sm:py-9 px-4 sm:px-6 flex items-center gap-4 border-b-2 border-default-200'>
+        <div className='py-6 sm:py-9 px-4 sm:px-6 flex items-center gap-4 border-b-1 border-default-200'>
             <div className='flex items-center gap-4 w-full'>
                 <Image src={d?.logo_url} alt='logo' className='rounded-full object-cover hidden sm:flex' loading='lazy' width={40} height={40} />
                 <div className='flex flex-col gap-4 w-full'>

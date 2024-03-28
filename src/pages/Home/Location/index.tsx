@@ -11,7 +11,7 @@ const Location = () => {
         <div id='location'>
             <h2 className='font-semibold text-3xl md:text-5xl text-center pb-12'>Bizning manzil</h2>
             <div className='flex gap-5 flex-col items-center lg:items-stretch lg:flex-row'>
-                <div className='w-full h-[616px] rounded-3xl border-1 border-primary overflow-hidden'>
+                <div className='w-full h-[500px] sm:h-[616px] rounded-3xl border-1 border-primary overflow-hidden'>
                     <YMaps>
                         <Map state={defaultState} className=' w-full h-full'>
                             <Placemark geometry={[...defaultState.center]} />

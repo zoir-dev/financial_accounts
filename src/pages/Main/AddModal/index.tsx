@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-const RowModal = ({ isOpen, onClose, data, setData, setIndex }: { isOpen: boolean, onClose: () => void, data?: any, setData: (val: any) => void, setIndex: (val: number) => void }) => {
+const AddModal = ({ isOpen, onClose, data, setData, setIndex }: { isOpen: boolean, onClose: () => void, data?: any, setData: (val: any) => void, setIndex: (val: number) => void }) => {
     const {
         reset,
         register,
@@ -27,7 +27,6 @@ const RowModal = ({ isOpen, onClose, data, setData, setIndex }: { isOpen: boolea
             try {
                 setLoading(true)
                 if (data?.name) {
-                    console.log(formData)
                     await http.put('home/partner/' + data.id, img ? formData : form)
                         .then(res => setData((d: any[]) => [res.data, ...d.filter(f => f.id !== data.id)]))
                     toast.success('Muvaffaqqiyatli tahrirlandi')
@@ -139,4 +138,4 @@ const RowModal = ({ isOpen, onClose, data, setData, setIndex }: { isOpen: boolea
     )
 }
 
-export default RowModal
+export default AddModal

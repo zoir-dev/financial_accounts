@@ -11,9 +11,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     const pathName = usePathname()
     const router = useRouter()
     const token = typeof window !== 'undefined' && localStorage.getItem('token')
+
     useEffect(() => {
         scrollTo({ top: 0, behavior: 'smooth' })
     }, [])
+
 
     useEffect(() => {
         if (token && (pathName === '/' || pathName === '/login')) {
@@ -21,7 +23,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
         } else if (!token && !['/', '/login'].find(f => f === pathName)) {
             router.push('/')
         }
-    }, [pathName, token, router])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token, pathName])
     return (
         <NextUIProvider>
             <Toaster position='top-center' />
